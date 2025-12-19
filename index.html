@@ -3,190 +3,383 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PromptCompare - Compare LLM Models</title>
+    <title>PromptCompare - Retro LLM Terminal</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'VT323', monospace;
+            background: #0a0a0a;
+            color: #00ff00;
             min-height: 100vh;
-            color: white;
             padding: 20px;
+            position: relative;
+            overflow-x: hidden;
         }
+        
+        /* CRT Effect */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 255, 0, 0.03) 0px,
+                transparent 1px,
+                transparent 2px,
+                rgba(0, 255, 0, 0.03) 3px
+            );
+            pointer-events: none;
+            z-index: 1000;
+            animation: scan 8s linear infinite;
+        }
+        
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(10px); }
+        }
+        
+        /* Flicker effect */
+        @keyframes flicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.97; }
+        }
+        
+        body {
+            animation: flicker 0.15s infinite;
+        }
+        
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
+        
+        .terminal-header {
+            border: 3px solid #00ff00;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: rgba(0, 20, 0, 0.8);
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.5), inset 0 0 20px rgba(0, 255, 0, 0.1);
+        }
+        
         h1 {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 2rem;
             text-align: center;
-            font-size: 3rem;
             margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00;
+            animation: glow 2s ease-in-out infinite alternate;
         }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00; }
+            to { text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00; }
+        }
+        
         .subtitle {
             text-align: center;
+            font-size: 1.3rem;
+            color: #00cc00;
+        }
+        
+        .ascii-art {
+            text-align: center;
+            font-size: 0.8rem;
+            line-height: 1;
+            margin: 10px 0;
+            color: #00aa00;
+        }
+        
+        .section {
+            border: 2px solid #00ff00;
+            padding: 25px;
+            margin-bottom: 20px;
+            background: rgba(0, 15, 0, 0.95);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+        
+        h2 {
+            font-family: 'Press Start 2P', monospace;
             font-size: 1.2rem;
-            margin-bottom: 40px;
-            opacity: 0.9;
+            margin-bottom: 20px;
+            color: #00ffff;
+            text-shadow: 0 0 5px #00ffff;
         }
-        .card {
-            background: rgba(255,255,255,0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        
+        h2::before {
+            content: "> ";
+            color: #ffff00;
         }
+        
         .models {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 15px;
             margin-bottom: 20px;
         }
+        
         .model-btn {
-            background: rgba(255,255,255,0.2);
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 10px;
-            padding: 20px;
+            background: #001a00;
+            border: 2px solid #00aa00;
+            padding: 15px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             text-align: center;
+            position: relative;
+            font-size: 1.1rem;
         }
+        
         .model-btn:hover {
-            background: rgba(255,255,255,0.3);
+            background: #002a00;
+            border-color: #00ff00;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
             transform: translateY(-2px);
         }
+        
         .model-btn.selected {
-            background: rgba(100,200,255,0.4);
-            border-color: #64b5f6;
+            background: #003300;
+            border: 2px solid #ffff00;
+            box-shadow: 0 0 20px rgba(255, 255, 0, 0.6), inset 0 0 10px rgba(255, 255, 0, 0.2);
         }
-        .model-name { font-weight: bold; font-size: 1.1rem; }
-        .model-provider { opacity: 0.8; font-size: 0.9rem; margin-top: 5px; }
+        
+        .model-btn.selected::before {
+            content: "[ACTIVE] ";
+            color: #ffff00;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 0.7rem;
+        }
+        
+        .model-name {
+            font-family: 'Press Start 2P', monospace;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            color: #00ff00;
+        }
+        
+        .model-provider {
+            color: #00cc00;
+            font-size: 1rem;
+        }
+        
         textarea {
             width: 100%;
-            min-height: 150px;
-            padding: 15px;
-            border-radius: 10px;
-            border: none;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            font-size: 1rem;
+            min-height: 180px;
+            padding: 20px;
+            border: 2px solid #00ff00;
+            background: #000a00;
+            color: #00ff00;
+            font-family: 'VT323', monospace;
+            font-size: 1.4rem;
             resize: vertical;
+            box-shadow: inset 0 0 20px rgba(0, 255, 0, 0.1);
         }
-        textarea::placeholder { color: rgba(255,255,255,0.6); }
+        
+        textarea::placeholder {
+            color: #006600;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #ffff00;
+            box-shadow: 0 0 15px rgba(255, 255, 0, 0.5), inset 0 0 20px rgba(0, 255, 0, 0.1);
+        }
+        
         button {
-            background: #64b5f6;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 1.1rem;
-            border-radius: 10px;
+            background: #001a00;
+            color: #00ff00;
+            border: 3px solid #00ff00;
+            padding: 18px 45px;
+            font-family: 'Press Start 2P', monospace;
+            font-size: 1rem;
             cursor: pointer;
-            transition: all 0.3s;
             display: block;
-            margin: 20px auto 0;
+            margin: 25px auto 0;
+            transition: all 0.2s;
+            text-shadow: 0 0 5px #00ff00;
+            position: relative;
         }
-        button:hover { background: #42a5f5; transform: scale(1.05); }
-        button:disabled { background: #999; cursor: not-allowed; }
+        
+        button::before {
+            content: "▶ ";
+        }
+        
+        button::after {
+            content: " ◀";
+        }
+        
+        button:hover {
+            background: #003300;
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.8);
+            transform: scale(1.05);
+        }
+        
+        button:disabled {
+            background: #0a0a0a;
+            color: #004400;
+            border-color: #004400;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        button:disabled::before,
+        button:disabled::after {
+            content: "█ ";
+        }
+        
         .results {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 20px;
         }
+        
         .result-card {
-            background: rgba(255,255,255,0.15);
-            border-radius: 10px;
+            background: #000a00;
+            border: 2px solid #00cc00;
             padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.2);
         }
-        .result-header { font-weight: bold; margin-bottom: 10px; font-size: 1.2rem; }
-        .result-meta { opacity: 0.8; font-size: 0.9rem; margin-bottom: 15px; }
+        
+        .result-header {
+            font-family: 'Press Start 2P', monospace;
+            font-weight: bold;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            color: #ffff00;
+            text-shadow: 0 0 5px #ffff00;
+        }
+        
+        .result-meta {
+            color: #00ffff;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            font-family: 'VT323', monospace;
+        }
+        
         .result-text {
-            background: rgba(0,0,0,0.2);
+            background: #000;
             padding: 15px;
-            border-radius: 8px;
-            max-height: 200px;
+            border: 1px solid #00aa00;
+            max-height: 250px;
             overflow-y: auto;
-            line-height: 1.5;
+            line-height: 1.4;
+            font-size: 1.2rem;
+            color: #00ff00;
+        }
+        
+        .result-text::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        .result-text::-webkit-scrollbar-track {
+            background: #000;
+        }
+        
+        .result-text::-webkit-scrollbar-thumb {
+            background: #00ff00;
+            border: 1px solid #00aa00;
+        }
+        
+        /* Blink cursor effect */
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background: #00ff00;
+            animation: blink 1s infinite;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🚀 PromptCompare</h1>
-        <p class="subtitle">Compare 5+13+ models side-by-side instantly</p>
+        <div class="terminal-header">
+            <div class="ascii-art">
+ _____ _____ _____ _____ _____ _____    _____ _____ _____ _____ _____ _____ _____ 
+|  _  | __  |   __|     |  _  |_   _|  |     |     |     |  _  |  _  | __  |   __|
+|   __|    -|  |  | | | |   __| | |    |   --|  |  | | | |   __|     |    -|   __|
+|__|  |__|  |_____|_|_|_|  |  | |_|    |_____|_____|_|_|_|  |  |__|  |__|__|_____|\n            </div>
+            <h1>PROMPTCOMPARE</h1>
+            <p class="subtitle">[ RETRO LLM TERMINAL v1.0 - 13+ MODELS ]</p>
+        </div>
         
-        <div class="card">
-            <h2 style="margin-bottom: 20px;">Select Models</h2>
+        <div class="section">
+            <h2>SELECT MODELS</h2>
             <div class="models" id="models">
                 <div class="model-btn" data-id="groq-llama">
-                    <div class="model-name">Groq Llama 3144
-                        v>
-                    <div class="model-provider">Groq</div>
+                    <div class="model-name">GROQ LLAMA 3</div>
+                    <div class="model-provider">[GROQ]</div>
                 </div>
                 <div class="model-btn" data-id="gemini-pro">
-                    <div class="model-name">Gemini Pro</div>
-                    <div class="model-provider">Google</div>
+                    <div class="model-name">GEMINI PRO</div>
+                    <div class="model-provider">[GOOGLE]</div>
                 </div>
                 <div class="model-btn" data-id="mistral-7b">
-                    <div class="model-name">Mistral 7B</div>
-                    <div class="model-provider">Mistral</div>
+                    <div class="model-name">MISTRAL 7B</div>
+                    <div class="model-provider">[MISTRAL]</div>
                 </div>
                 <div class="model-btn" data-id="claude-instant">
-                    <div class="model-name">Claude Instant</div>
-                    <div class="model-provider">Anthropic</div>
+                    <div class="model-name">CLAUDE INSTANT</div>
+                    <div class="model-provider">[ANTHROPIC]</div>
                 </div>
                 <div class="model-btn" data-id="gpt-3.5-turbo">
-                    <div class="model-name">GPT-3.5 Turbo</div>
-                    <div class="model-provider">OpenAI</div>
+                    <div class="model-name">GPT-3.5 TURBO</div>
+                    <div class="model-provider">[OPENAI]</div>
                 </div>
-            </div>
-                                <div class="model-btn" data-id="cohere-command">
-                    <div class="model-name">Cohere Command220
-                        v>
-                    <div class="model-provider">Cohere</div>
+                <div class="model-btn" data-id="cohere-command">
+                    <div class="model-name">COHERE COMMAND</div>
+                    <div class="model-provider">[COHERE]</div>
                 </div>
                 <div class="model-btn" data-id="meta-llama-2">
-                    <div class="model-name">Meta Llama 2 70B</div>
-                    <div class="model-provider">Meta</div>
+                    <div class="model-name">META LLAMA 2 70B</div>
+                    <div class="model-provider">[META]</div>
                 </div>
                 <div class="model-btn" data-id="palm-2">
-                    <div class="model-name">PaLM 2</div>
-                    <div class="model-provider">Google</div>
+                    <div class="model-name">PALM 2</div>
+                    <div class="model-provider">[GOOGLE]</div>
                 </div>
                 <div class="model-btn" data-id="gpt-4-turbo">
-                    <div class="model-name">GPT-4 Turbo</div>
-                    <div class="model-provider">OpenAI</div>
+                    <div class="model-name">GPT-4 TURBO</div>
+                    <div class="model-provider">[OPENAI]</div>
                 </div>
                 <div class="model-btn" data-id="claude-2">
-                    <div class="model-name">Claude 2</div>
-                    <div class="model-provider">Anthropic</div>
+                    <div class="model-name">CLAUDE 2</div>
+                    <div class="model-provider">[ANTHROPIC]</div>
                 </div>
                 <div class="model-btn" data-id="mixtral-8x7b">
-                    <div class="model-name">Mixtral 8x7B</div>
-                    <div class="model-provider">Mistral</div>
+                    <div class="model-name">MIXTRAL 8X7B</div>
+                    <div class="model-provider">[MISTRAL]</div>
                 </div>
                 <div class="model-btn" data-id="yi-34b">
-                    <div class="model-name">Yi 34B</div>
-                    <div class="model-provider">01.AI</div>
+                    <div class="model-name">YI 34B</div>
+                    <div class="model-provider">[01.AI]</div>
                 </div>
                 <div class="model-btn" data-id="deepseek-coder">
-                    <div class="model-name">DeepSeek Coder</div>
-                    <div class="model-provider">DeepSeek</div>
+                    <div class="model-name">DEEPSEEK CODER</div>
+                    <div class="model-provider">[DEEPSEEK]</div>
                 </div>
+            </div>
         </div>
-
-        <div class="card">
-            <h2 style="margin-bottom: 15px;">Enter Your Prompt</h2>
-            <textarea id="prompt" placeholder="Type your prompt here... e.g., 'Write a short story about AI'"></textarea>
-      
-            <button id="compareBtn" onclick="compare()">Compare Models</button>
-    
-        230
-            v>
-
+        
+        <div class="section">
+            <h2>ENTER YOUR PROMPT</h2>
+            <textarea id="prompt" placeholder="> Type your prompt here... e.g., 'Explain quantum computing'"></textarea>
+            <button id="compareBtn" onclick="compare()">RUN COMPARISON</button>
+        </div>
+        
         <div id="resultsContainer"></div>
     </div>
-
+    
     <script>
         const selectedModels = new Set();
         
@@ -202,54 +395,54 @@
                 }
             });
         });
-
+        
         async function compare() {
             const prompt = document.getElementById('prompt').value;
             if (!prompt || selectedModels.size === 0) {
-                alert('Please select models and enter a prompt!');
+                alert('[ERROR] Please select models and enter a prompt!');
                 return;
             }
-
+            
             const btn = document.getElementById('compareBtn');
             btn.disabled = true;
-            btn.textContent = 'Comparing...';
-
+            btn.textContent = 'PROCESSING...';
+            
             const container = document.getElementById('resultsContainer');
-            container.innerHTML = '<div class="card"><h2>Results</h2><p>Generating responses... (This is a demo with mock data)</p></div>';
-
-            // Simulate API calls with mock data
+            container.innerHTML = '<div class="section"><h2>GENERATING RESPONSES</h2><p style="font-size:1.3rem;">Please wait... Running comparison across selected models...<span class="cursor"></span></p></div>';
+            
             setTimeout(() => {
                 const results = Array.from(selectedModels).map(id => {
                     const modelNames = {
-                        'groq-llama': 'Groq Llama 3',
-                        'gemini-pro': 'Gemini Pro',
-                        'mistral-7b': 'Mistral 7B',
-                        'claude-instant': 'Claude Instant',
-                                                'cohere-command': 'Cohere Command',
-                        'meta-llama-2': 'Meta Llama 2 70B',
-                        'palm-2': 'PaLM 2',
-                        'gpt-4-turbo': 'GPT-4 Turbo',
-                        'claude-2': 'Claude 2',
-                        'mixtral-8x7b': 'Mixtral 8x7B',
-                        'yi-34b': 'Yi 34B',
-                'deepseek-coder': 'DeepSeek Coder',                        'gpt-3.5-turbo': 'GPT-3.5 Turbo'
+                        'groq-llama': 'GROQ LLAMA 3',
+                        'gemini-pro': 'GEMINI PRO',
+                        'mistral-7b': 'MISTRAL 7B',
+                        'claude-instant': 'CLAUDE INSTANT',
+                        'cohere-command': 'COHERE COMMAND',
+                        'meta-llama-2': 'META LLAMA 2 70B',
+                        'palm-2': 'PALM 2',
+                        'gpt-4-turbo': 'GPT-4 TURBO',
+                        'claude-2': 'CLAUDE 2',
+                        'mixtral-8x7b': 'MIXTRAL 8X7B',
+                        'yi-34b': 'YI 34B',
+                        'deepseek-coder': 'DEEPSEEK CODER',
+                        'gpt-3.5-turbo': 'GPT-3.5 TURBO'
                     };
                     return {
                         name: modelNames[id],
                         speed: (1 + Math.random() * 2).toFixed(2),
                         cost: (Math.random() * 0.01).toFixed(4),
-                        response: `This is a demo response from ${modelNames[id]}. In production, this would connect to real LLM APIs to generate responses based on your prompt: "${prompt}". Each model would provide unique perspectives and capabilities.`
+                        response: `>>> RESPONSE FROM ${modelNames[id]} <<<\n\nThis is a demo response. In production, this would connect to real LLM APIs to generate responses based on your prompt: "${prompt}". Each model would provide unique perspectives and capabilities.\n\n[END OF TRANSMISSION]`
                     };
                 });
-
+                
                 container.innerHTML = `
-                    <div class="card">
-                        <h2 style="margin-bottom: 20px;">Comparison Results</h2>
+                    <div class="section">
+                        <h2>COMPARISON RESULTS</h2>
                         <div class="results">
                             ${results.map(r => `
                                 <div class="result-card">
                                     <div class="result-header">${r.name}</div>
-                                    <div class="result-meta">⚡ ${r.speed}s | 💰 $${r.cost}</div>
+                                    <div class="result-meta">⚡ SPEED: ${r.speed}s | 💰 COST: $${r.cost}</div>
                                     <div class="result-text">${r.response}</div>
                                 </div>
                             `).join('')}
@@ -258,7 +451,7 @@
                 `;
                 
                 btn.disabled = false;
-                btn.textContent = 'Compare Models';
+                btn.textContent = 'RUN COMPARISON';
             }, 2000);
         }
     </script>
