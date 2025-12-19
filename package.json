@@ -1,4 +1,4 @@
-package.json  {
+{
   "name": "promptcompare",
   "version": "1.0.0",
   "description": "Compare free LLM models side-by-side",
