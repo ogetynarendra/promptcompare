@@ -119,7 +119,8 @@
             <h2 style="margin-bottom: 20px;">Select Models</h2>
             <div class="models" id="models">
                 <div class="model-btn" data-id="groq-llama">
-                    <div class="model-name">Groq Llama 3</div>
+                    <div class="model-name">Groq Llama 3144
+                        v>
                     <div class="model-provider">Groq</div>
                 </div>
                 <div class="model-btn" data-id="gemini-pro">
@@ -138,9 +139,10 @@
                     <div class="model-name">GPT-3.5 Turbo</div>
                     <div class="model-provider">OpenAI</div>
                 </div>
-            </di
+            </div>
                                 <div class="model-btn" data-id="cohere-command">
-                    <div class="model-name">Cohere Command</div>
+                    <div class="model-name">Cohere Command220
+                        v>
                     <div class="model-provider">Cohere</div>
                 </div>
                 <div class="model-btn" data-id="meta-llama-2">
@@ -170,14 +172,17 @@
                 <div class="model-btn" data-id="deepseek-coder">
                     <div class="model-name">DeepSeek Coder</div>
                     <div class="model-provider">DeepSeek</div>
-                </div>v>
+                </div>
         </div>
 
         <div class="card">
             <h2 style="margin-bottom: 15px;">Enter Your Prompt</h2>
             <textarea id="prompt" placeholder="Type your prompt here... e.g., 'Write a short story about AI'"></textarea>
+      
             <button id="compareBtn" onclick="compare()">Compare Models</button>
-        </div>
+    
+        230
+            v>
 
         <div id="resultsContainer"></div>
     </div>
@@ -230,7 +235,7 @@
                 'deepseek-coder': 'DeepSeek Coder',                        'gpt-3.5-turbo': 'GPT-3.5 Turbo'
                     };
                     return {
-                        name: modelNames[id]
+                        name: modelNames[id],
                         speed: (1 + Math.random() * 2).toFixed(2),
                         cost: (Math.random() * 0.01).toFixed(4),
                         response: `This is a demo response from ${modelNames[id]}. In production, this would connect to real LLM APIs to generate responses based on your prompt: "${prompt}". Each model would provide unique perspectives and capabilities.`
