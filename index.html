@@ -231,7 +231,7 @@
                         'gpt-3.5-turbo': 'GPT-3.5 Turbo'
                     };
                     return {
-                        name: modelNames[id],
+                        name: modelNames[id],,
                         speed: (1 + Math.random() * 2).toFixed(2),
                         cost: (Math.random() * 0.01).toFixed(4),
                         response: `This is a demo response from ${modelNames[id]}. In production, this would connect to real LLM APIs to generate responses based on your prompt: "${prompt}". Each model would provide unique perspectives and capabilities.`
