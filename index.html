@@ -1,3 +1,4 @@
+356
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -347,7 +348,8 @@ btn.classList.add('selected');
 });
 });
 
-async function compare() {
+350
+    () {
 const prompt = document.getElementById('prompt').value;
 if (!prompt || selectedModels.size === 0) {
 alert('[ERROR] Please select models and enter a prompt!');
@@ -361,50 +363,60 @@ btn.textContent = 'PROCESSING...';
 const container = document.getElementById('resultsContainer');
 container.innerHTML = '<div class="section"><h2>GENERATING RESPONSES</h2><p style="font-size:1.5rem;">Please wait... Running comparison across selected models...<span class="cursor"></span></p></div>';
 
-setTimeout(() => {
-const results = Array.from(selectedModels).map(id => {
-const modelNames = {
-'groq-llama': 'GROQ LLAMA 3',
-'gemini-pro': 'GEMINI PRO',
-'mistral-7b': 'MISTRAL 7B',
-'claude-instant': 'CLAUDE INSTANT',
-'cohere-command': 'COHERE COMMAND',
-'meta-llama-2': 'META LLAMA 2 70B',
-'palm-2': 'PALM 2',
-'gpt-4-turbo': 'GPT-4 TURBO',
-'claude-2': 'CLAUDE 2',
-'mixtral-8x7b': 'MIXTRAL 8X7B',
-'yi-34b': 'YI 34B',
-'deepseek-coder': 'DEEPSEEK CODER',
-'gpt-3.5-turbo': 'GPT-3.5 TURBO'
-};
-return {
-name: modelNames[id],
-speed: (1 + Math.random() * 2).toFixed(2),
-cost: (Math.random() * 0.01).toFixed(4),
-response: `>>> RESPONSE FROM ${modelNames[id]} <<<\n\nThis is a demo response. In production, this would connect to real LLM APIs to generate responses based on your prompt: "${prompt}". Each model would provide unique perspectives and capabilities.\n\n[END OF TRANSMISSION]`
-};
+// REAL GROQ API INTEGRATION
+try {
+const startTime = Date.now();
+const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+method: 'POST',
+headers: {
+'Authorization': 'Bearer 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',
+'Content-Type': 'application/json'
+},
+body: JSON.stringify({
+model: 'llama-3.3-70b-versatile',
+messages: [{ role: 'user', content: prompt }],
+temperature: 0.7,
+max_tokens: 500
+})
 });
+const data = await response.json();
+const speed = ((Date.now() - startTime) / 1000).toFixed(2);
 
+
+const result = {
+name: 'GROQ LLAMA 3 (REAL API)',
+speed: speed,
+cost: '$0.00 (FREE)',
+response: data.choices[0].message.content
+};
+    
 container.innerHTML = `
 <div class="section">
-<h2>COMPARISON RESULTS</h2>
+<h2>COMPARISON RESULTS - REAL GROQ API</h2>
 <div class="results">
-${results.map(r => `
 <div class="result-card">
-<div class="result-header">${r.name}</div>
-<div class="result-meta">⚡ SPEED: ${r.speed}s | 💰 COST: $${r.cost}</div>
-<div class="result-text">${r.response}</div>
+<div class="result-header">${result.name}</div>
+<div class="result-meta">⚡ SPEED: ${result.speed}s | 💰 COST: ${result.cost}</div>
+<div class="result-text">${result.response}</div>
 </div>
-`).join('')}
 </div>
 </div>
 `;
 
-btn.disabled = false;
+
+
+} catch (error) {
+container.innerHTML = '<div class="section"><h2>ERROR</h2><p style="color:#ff0000; font-size:1.3rem;">API Error: ' + error.message + '</p></div>';
+} finally {
+        btn.disabled = false;
 btn.textContent = 'RUN COMPARISON';
-}, 2000);
+    }
 }
+    
+
+
+
+
 </script>
 </body>
 </html>
