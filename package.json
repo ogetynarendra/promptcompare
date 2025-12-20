@@ -1,11 +1,39 @@
 {
   "name": "promptcompare",
-  "version": "1.0.0",
-  "description": "Compare free LLM models side-by-side",
+  "version": "2.0.0",
+  "description": "Compare 13+ free LLM models side-by-side in a retro terminal interface. Test prompts across Groq, OpenAI, Google, Anthropic, Mistral and more.",
+  "author": "Narendra Ogetyn",
+  "license": "MIT",
+  "homepage": "https://github.com/ogetynarendra/promptcompare#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ogetynarendra/promptcompare.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ogetynarendra/promptcompare/issues"
+  },
+  "keywords": [
+    "llm",
+    "ai",
+    "prompt-engineering",
+    "groq",
+    "openai",
+    "anthropic",
+    "gemini",
+    "mistral",
+    "model-comparison",
+    "nextjs",
+    "typescript",
+    "prompt-testing"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\""
   },
   "dependencies": {
     "next": "14.2.0",
@@ -14,10 +42,18 @@
     "groq-sdk": "^0.3.0"
   },
   "devDependencies": {
-"typescript": "^5"    "@types/react": "18.3.0",
+    "typescript": "^5",
+    "@types/react": "18.3.0",
     "@types/node": "20.11.0",
     "tailwindcss": "3.4.0",
     "postcss": "8.4.0",
-    "autoprefixer": "10.4.0"
+    "autoprefixer": "10.4.0",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.0",
+    "prettier": "^3.2.5"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
   }
 }
