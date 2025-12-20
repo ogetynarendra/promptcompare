@@ -99,7 +99,7 @@ async function callModelAPI(modelId: string, prompt: string): Promise<ModelResul
     'groq-llama': {
       name: 'Groq Llama 3',
       provider: 'Groq',
-      handler: () => groqClient ? callGroqAPI(prompt, 'llama3-8b-8192') : mockAPICall(prompt, 'Groq Llama 3'),
+      handler: () => groqClient ? callGroqAPI(prompt, 'llama-3.1-8b-instant') : mockAPICall(prompt, 'Groq Llama 3'),
     },
     'groq-mixtral': {
       name: 'Mixtral 8x7B',
